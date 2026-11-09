@@ -3,14 +3,24 @@
 namespace Application;
 
 use Zend\EventManager\EventInterface;
+use Zend\Http\Response as HttpResponse;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\Mvc\MvcEvent;
+use RuntimeException;
 
 class Module implements BootstrapListenerInterface
 {
-    public function getConfig()
+    /**
+     * @return array<array-key, mixed>
+     */
+    public function getConfig(): array
     {
-        return include __DIR__ . '/config/module.config.php';
+        $config = include __DIR__ . '/config/module.config.php';
+        if (!is_array($config)) {
+            throw new RuntimeException('Module config must return an array');
+        }
+
+        return $config;
     }
 
     public function onBootstrap(EventInterface $event)
@@ -23,6 +33,10 @@ class Module implements BootstrapListenerInterface
             MvcEvent::EVENT_DISPATCH_ERROR,
             function (MvcEvent $errorEvent) {
                 $response = $errorEvent->getResponse();
+                if (!$response instanceof HttpResponse) {
+                    return;
+                }
+
                 $status = $response->getStatusCode();
                 if ($status < 400) {
                     $status = 500;

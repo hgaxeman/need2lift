@@ -18,7 +18,7 @@ See [Contracts that must not change](#contracts-that-must-not-change).
 | Console | none | No console commands exist. |
 | Mail, templates, logging, HTTP clients, CORS, sanitising | none | None in use (inventory 2026-11-09). |
 | Tests | PHPUnit 9.6, black-box HTTP golden files | Upgraded after Zend is removed. Runner on PHP 7.4 known to work; on 8.5 not verified. [ADR-0010](docs/adr/0010-black-box-harness.md) |
-| Static analysis | PHPStan, maximum level, zero errors, no baseline, run by hand (no CI) | Version to pin is (verify) against PHP 7.4 at p0-03. [ADR-0006](docs/adr/0006-safety-net.md) |
+| Static analysis | PHPStan 2.3.5, maximum level, zero errors, no baseline, run by hand (no CI) | Runs on PHP 7.4 (Composer requires `php ^7.4` or `^8.0`). Verified 2026-11-09: 0 errors. [ADR-0006](docs/adr/0006-safety-net.md) |
 | Refactoring | Rector 2.8.4, config committed, dry run must be empty | Installed 2026-11-09. [ADR-0006](docs/adr/0006-safety-net.md) |
 | Coding standard | none chosen | Add one only if Rector's output needs it (verify at Phase 1). |
 
@@ -29,7 +29,7 @@ Measured on 2026-11-09 in `/home/njegovan/PhpstormProjects/need2lift`, at commit
 - **Runtime:** `Dockerfile` line 1 `FROM composer:2.2 AS composer`, line 3 `FROM php:7.4-apache`. `docker-compose.yml` builds it and publishes `8080:80`. No CI configuration and no production runtime: this is a demo project, and the Compose image is the only runtime ([ADR-0013](docs/adr/0013-demo-no-production-no-ci.md)). Host PHP for analysis is 8.5.4.
 - **Size:** 5 PHP files outside `vendor/`. 4 test classes under `tests/Golden/`. 15 golden files in `tests/golden/` (13 public contract cases, 1 dispatch-failure case, 1 default-image absence guard).
 - **Framework modules loaded:** `Application` only (`config/application.config.php` lines 4-6).
-- **Composer:** `require.php` is `^7.4`. `composer.lock` holds 55 packages (27 prod, 28 dev), platform `^7.4`. Dev: `phpunit/phpunit` 9.6.38, resolved for PHP 7.4 (`doctrine/instantiator` 1.5.0, `myclabs/deep-copy` 1.13.4; the newer releases require PHP 8). 12 direct Zend packages; `zendframework/zend-mvc` 2.7.15. All Zend packages are marked abandoned in favour of `laminas/*`. No forks, no `dev-*` versions, no VCS or path repositories.
+- **Composer:** `require.php` is `^7.4`. `composer.lock` holds 56 packages (27 prod, 29 dev), platform `^7.4`. Dev: `phpunit/phpunit` 9.6.38, `phpstan/phpstan` 2.3.5. 12 direct Zend packages; `zendframework/zend-mvc` 2.7.15. All Zend packages are marked abandoned in favour of `laminas/*`. No forks, no `dev-*` versions, no VCS or path repositories.
 - **Vendor:** `vendor/` was installed on the host on 2026-11-09 with `composer install --ignore-platform-reqs`. It is gitignored. The image installs its own (`Dockerfile` lines 33-34).
 - **Working tree:** `git status` shows only the new `GLOSSARY.md` and `docs/`, and `MIGRATION.md` once written.
 
@@ -144,6 +144,7 @@ Every todo is one change that ends green. Plans live in `.cursor/plans/`.
 | Docker | server 29.9.3, compose 5.7.0 | `docker compose build`, `docker compose up -d` |
 | Host PHP | 8.5.4 | Runs Rector and the analysis commands |
 | PHPUnit 9.6.38 | `vendor/bin/phpunit` (dev dependency) | Black-box golden runner. Verified 2026-11-09 on host PHP 8.5.4 and in `php:7.4-cli` with `--network host` (`host.docker.internal` does not resolve on this Linux host). 15 files in `tests/golden/`. Default image: `BASE_URL=http://localhost:8080 vendor/bin/phpunit -c tests/phpunit.xml.dist`. Failure route: `docker compose -f docker-compose.yml -f docker-compose.test.yml up -d --build`, then `GOLDEN_FAILURE_ROUTE=1 BASE_URL=http://localhost:8080 vendor/bin/phpunit -c tests/phpunit.xml.dist`. Re-record only with `GOLDEN_RECORD=1` (needs approval). |
+| PHPStan 2.3.5 | `vendor/bin/phpstan` (dev dependency), `phpstan.neon` | `vendor/bin/phpstan analyse --level=max --no-progress`. Paths: `public`, `config`, `module`. 0 errors, no baseline. Verified on host PHP 8.5.4 and `php:7.4-cli`. |
 
 Rector from the project root, with the committed config once p0-04 lands: `TMPDIR=~/.cache/rector rector process --config rector.php --dry-run`.
 
