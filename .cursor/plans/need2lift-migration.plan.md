@@ -19,7 +19,7 @@ todos:
     status: cancelled
   - id: p1-php85-image
     content: "Phase 1: Base image php:8.5-apache, Composer ignores only the PHP requirement, display_errors stays off (Approval: runtime image change)"
-    status: pending
+    status: completed
   - id: p1-rector-85
     content: "Phase 1: Rector config pinned to PHP 8.5, dry run empty"
     status: pending

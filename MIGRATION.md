@@ -17,7 +17,7 @@ See [Contracts that must not change](#contracts-that-must-not-change).
 | API | none | Plain text, one greeting; no new API. [ADR-0002](docs/adr/0002-frozen-contracts.md) |
 | Console | none | No console commands exist. |
 | Mail, templates, logging, HTTP clients, CORS, sanitising | none | None in use (inventory 2026-11-09). |
-| Tests | PHPUnit 9.6, black-box HTTP golden files | Upgraded after Zend is removed. Runner on PHP 7.4 known to work; on 8.5 not verified. [ADR-0010](docs/adr/0010-black-box-harness.md) |
+| Tests | PHPUnit 9.6, black-box HTTP golden files | Upgraded after Zend is removed. Runner verified on host PHP 8.5.4 and `php:7.4-cli` against the Compose image (now PHP 8.5). [ADR-0010](docs/adr/0010-black-box-harness.md) |
 | Static analysis | PHPStan 2.3.5, maximum level, zero errors, no baseline, run by hand (no CI) | Runs on PHP 7.4 (Composer requires `php ^7.4` or `^8.0`). Verified 2026-11-09: 0 errors. [ADR-0006](docs/adr/0006-safety-net.md) |
 | Refactoring | Rector 2.8.4, `rector.php` committed, dry run must be empty | Pinned exactly as a dev dependency. Target PHP 7.4, type coverage level 0. Verified 2026-11-09: dry run 0 files. [ADR-0006](docs/adr/0006-safety-net.md) |
 | Coding standard | none chosen | Add one only if Rector's output needs it (verify at Phase 1). |
@@ -26,11 +26,11 @@ See [Contracts that must not change](#contracts-that-must-not-change).
 
 Measured on 2026-11-09 in `/home/njegovan/PhpstormProjects/need2lift`, at commit `e21c4b7` ("hello php"), which sits on `d252383` ("init - php 7.4").
 
-- **Runtime:** `Dockerfile` line 1 `FROM composer:2.2 AS composer`, line 3 `FROM php:7.4-apache`. `docker-compose.yml` builds it and publishes `8080:80`. No CI configuration and no production runtime: this is a demo project, and the Compose image is the only runtime ([ADR-0013](docs/adr/0013-demo-no-production-no-ci.md)). Host PHP for analysis is 8.5.4.
+- **Runtime:** `Dockerfile` line 1 `FROM composer:2.2 AS composer` (Composer 2.2.31 on PHP 8.5.12 in that image, verified 2026-11-09), line 3 `FROM php:8.5-apache`. Bullseye apt archive workaround removed. Extensions: `intl` and `zip` (`libicu-dev`, `libzip-dev`). Composer install uses `--ignore-platform-req=php` only ([ADR-0008](docs/adr/0008-single-php-raise.md)). `display_errors=Off`, `log_errors=On`. `docker-compose.yml` builds it and publishes `8080:80`. No CI configuration and no production runtime: this is a demo project, and the Compose image is the only runtime ([ADR-0013](docs/adr/0013-demo-no-production-no-ci.md)). Host PHP for analysis is 8.5.4. Golden suite verified 2026-11-09 against the 8.5 image: greeting `Hello from PHP 8.5.12`, files under `tests/golden/` unchanged.
 - **Size:** 5 PHP files outside `vendor/`. 4 test classes under `tests/Golden/`. 15 golden files in `tests/golden/` (13 public contract cases, 1 dispatch-failure case, 1 default-image absence guard).
 - **Framework modules loaded:** `Application` only (`config/application.config.php` lines 4-6).
 - **Composer:** `require.php` is `^7.4`. `composer.lock` holds 57 packages (27 prod, 30 dev), platform `^7.4`. Dev: `phpunit/phpunit` 9.6.38, `phpstan/phpstan` 2.3.5, `rector/rector` 2.8.4. 12 direct Zend packages; `zendframework/zend-mvc` 2.7.15. All Zend packages are marked abandoned in favour of `laminas/*`. No forks, no `dev-*` versions, no VCS or path repositories.
-- **Vendor:** `vendor/` was installed on the host on 2026-11-09 with `composer install --ignore-platform-reqs`. It is gitignored. The image installs its own (`Dockerfile` lines 33-34).
+- **Vendor:** `vendor/` was installed on the host on 2026-11-09 with `composer install --ignore-platform-reqs`. It is gitignored. The image installs its own (`Dockerfile` lines 27-28).
 - **Working tree:** `git status` shows only the new `GLOSSARY.md` and `docs/`, and `MIGRATION.md` once written.
 
 ### Zend usage
@@ -151,7 +151,6 @@ Rector from the project root: `TMPDIR=~/.cache/rector vendor/bin/rector process 
 ## Still missing
 
 - Nothing blocking. The project needs no git remote, no production runtime and no CI ([ADR-0013](docs/adr/0013-demo-no-production-no-ci.md)).
-- **`Dockerfile` Composer stage.** `FROM composer:2.2` is untested on PHP 8.5. It is a check to run, not missing data (verify in p1-01).
 
 ## Approval needed
 
