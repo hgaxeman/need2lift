@@ -1,19 +1,19 @@
 ---
 name: p3-symfony-unknown-and-failures
-overview: "Symfony answers every request, so the bridge list is no longer needed for unknown requests and dispatch failures. Unknown requests get 404 Not found and dispatch failures get Error, both as text/plain. Every golden file must pass unchanged."
+overview: Symfony answers every request, so the bridge list is no longer needed for unknown requests and dispatch failures. Unknown requests get 404 Not found and dispatch failures get Error, both as text/plain. Every golden file must pass unchanged.
 todos:
   - id: verify
     content: Verify what Symfony 7.4 returns for an unknown path today (status, content type, body); save it for comparison
-    status: pending
+    status: completed
   - id: pr1-unknown
     content: "PR 1: Symfony returns 404 Not found for unknown requests, text/plain; charset=utf-8"
-    status: pending
+    status: completed
   - id: pr2-failures
     content: "PR 2: Symfony returns Error for dispatch failures, forcing status below 400 to 500 and keeping other statuses at or above 400, and the test-only failure route answers through Symfony"
-    status: pending
+    status: completed
   - id: validate
     content: Run the Validation checks; golden files unchanged; update MIGRATION.md and the master plan; one commit per PR
-    status: pending
+    status: completed
 isProject: false
 ---
 

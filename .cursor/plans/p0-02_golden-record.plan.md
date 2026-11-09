@@ -1,19 +1,19 @@
 ---
 name: p0-golden-record
-overview: "Record the golden files for every contract case, plus a test-only route that fails dispatch. The route exists only in a Compose test overlay, so the default image does not expose it."
+overview: Record the golden files for every contract case, plus a test-only route that fails dispatch. The route exists only in a Compose test overlay, so the default image does not expose it.
 todos:
   - id: verify
     content: Verify the preconditions below; save the probe output for comparison
-    status: pending
+    status: completed
   - id: pr1-golden-files
     content: "PR 1: Record golden files in tests/golden/ for the non-failure cases (Approval: first freeze of the contract)"
-    status: pending
+    status: completed
   - id: pr2-failure-route
     content: "PR 2: Test-only dispatch-failure route via docker-compose.test.yml and tests/fixtures/zz-test-routes.local.php, plus a guard test on the default image"
-    status: pending
+    status: completed
   - id: validate
     content: Run the Validation checks; golden files unchanged after recording; update MIGRATION.md and the master plan; one commit per PR
-    status: pending
+    status: completed
 isProject: false
 ---
 

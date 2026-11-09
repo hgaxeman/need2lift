@@ -1,16 +1,16 @@
 ---
 name: p3-remove-zend
-overview: "Delete the Zend module, its packages, the front controller's Zend bootstrap, and the Composer override in the Dockerfile. Tighten require.php to the runtime. After this, the image runs PHP 8.5 with Symfony only."
+overview: Delete the Zend module, its packages, the front controller's Zend bootstrap, and the Composer override in the Dockerfile. Tighten require.php to the runtime. After this, the image runs PHP 8.5 with Symfony only.
 todos:
   - id: verify
     content: Verify that no request reaches Zend (bridge list covers every path) and that the golden suite passes; save the output
-    status: pending
+    status: completed
   - id: pr1-remove
     content: "PR 1: Delete module/, config/application.config.php, Zend packages, Composer override, and tighten require.php (Approval: PHP constraint change, dependency removal)"
-    status: pending
+    status: completed
   - id: validate
     content: Run the Validation checks; golden files unchanged; update MIGRATION.md and the master plan; one commit per PR
-    status: pending
+    status: completed
 isProject: false
 ---
 

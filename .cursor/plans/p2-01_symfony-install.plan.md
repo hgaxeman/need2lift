@@ -1,16 +1,16 @@
 ---
 name: p2-symfony-install
-overview: "Install a minimal Symfony 7.4 with Flex next to the Zend application, so the kernel boots on PHP 8.5 and the golden suite still passes on the Zend path. Raising composer.json's PHP constraint is decided here only if Composer requires it."
+overview: Install a minimal Symfony 7.4 with Flex next to the Zend application, so the kernel boots on PHP 8.5 and the golden suite still passes on the Zend path. Raising composer.json's PHP constraint is decided here only if Composer requires it.
 todos:
   - id: verify
     content: Verify whether Composer resolves Symfony 7.4 with the locked Zend packages at require.php ^7.4 (dry run, no commit); save the output
-    status: pending
+    status: completed
   - id: pr1-symfony
     content: "PR 1: Add symfony/framework-bundle, runtime, dotenv and yaml at 7.4, with Flex; kernel boots; no route changed (Approval: new dependencies; PHP constraint if Composer requires it)"
-    status: pending
+    status: completed
   - id: validate
     content: Run the Validation checks; golden files unchanged; update MIGRATION.md and the master plan; one commit per PR
-    status: pending
+    status: completed
 isProject: false
 ---
 

@@ -1,16 +1,16 @@
 ---
 name: p0-golden-harness
-overview: "Add a black-box PHPUnit 9.6 runner that sends real HTTP requests to BASE_URL. It runs against the Compose image, so .htaccess and the vhost are covered. Nothing in the greeting or error contract changes yet."
+overview: Add a black-box PHPUnit 9.6 runner that sends real HTTP requests to BASE_URL. It runs against the Compose image, so .htaccess and the vhost are covered. Nothing in the greeting or error contract changes yet.
 todos:
   - id: verify
     content: Verify the preconditions below; save the output of `docker compose ps` and `curl -si http://localhost:8080/api/hello` as the baseline
-    status: pending
+    status: completed
   - id: pr1-golden-harness
     content: "PR 1: Add phpunit/phpunit ^9.6 as dev dependency, tests/phpunit.xml.dist and a smoke test (Approval: new dev dependency)"
-    status: pending
+    status: completed
   - id: validate
     content: Run the Validation checks; update MIGRATION.md and the master plan; one commit per PR
-    status: pending
+    status: completed
 isProject: false
 ---
 

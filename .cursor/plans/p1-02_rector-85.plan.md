@@ -1,16 +1,16 @@
 ---
 name: p1-rector-85
-overview: "Move the committed Rector configuration from the PHP 7.4 target to PHP 8.5, so the dry run checks syntax and rules against the runtime the code now runs on."
+overview: Move the committed Rector configuration from the PHP 7.4 target to PHP 8.5, so the dry run checks syntax and rules against the runtime the code now runs on.
 todos:
   - id: verify
     content: Verify the Compose image runs PHP 8.5 (p1-php85-image completed); save the dry run output
-    status: pending
+    status: completed
   - id: pr1-rector-85
     content: "PR 1: rector.php targets PHP_85; dry run empty (no approval needed; the target follows the runtime)"
-    status: pending
+    status: completed
   - id: validate
     content: Run the Validation checks; update MIGRATION.md and the master plan; one commit per PR
-    status: pending
+    status: completed
 isProject: false
 ---
 

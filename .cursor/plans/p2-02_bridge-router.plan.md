@@ -1,16 +1,16 @@
 ---
 name: p2-bridge-router
-overview: "public/index.php sends a request to Symfony only when its path is exactly /api/hello. Every other request still goes to Zend. No reply changes, because Symfony has no route yet and returns nothing."
+overview: public/index.php sends a request to Symfony only when its path is exactly /api/hello. Every other request still goes to Zend. No reply changes, because Symfony has no route yet and returns nothing.
 todos:
   - id: verify
     content: Verify the bridge is an explicit list with exact matching; save the golden run before the change
-    status: pending
+    status: completed
   - id: pr1-bridge
     content: "PR 1: Bridge in public/index.php with an explicit path list (ADR-0009)"
-    status: pending
+    status: completed
   - id: validate
     content: Run the Validation checks; golden files unchanged; update MIGRATION.md and the master plan; one commit per PR
-    status: pending
+    status: completed
 isProject: false
 ---
 

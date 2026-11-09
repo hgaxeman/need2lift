@@ -1,19 +1,19 @@
 ---
 name: p3-upgrade-tools
-overview: "After Zend is gone, upgrade PHPUnit and Rector to versions that support PHP 8.5, and keep PHPStan on a release that does too. The golden suite is the check."
+overview: After Zend is gone, upgrade PHPUnit and Rector to versions that support PHP 8.5, and keep PHPStan on a release that does too. The golden suite is the check.
 todos:
   - id: verify
     content: Verify each tool's latest release supports PHP 8.5 (PHPUnit, PHPStan, Rector) against its release notes; save the version list
-    status: pending
+    status: completed
   - id: pr1-phpunit
     content: "PR 1: Upgrade PHPUnit to a release that supports PHP 8.5 (Approval: dependency change)"
-    status: pending
+    status: completed
   - id: pr2-rector-phpstan
     content: "PR 2: Upgrade Rector and PHPStan, with the Rector dry run empty on the new version (Approval: dependency change)"
-    status: pending
+    status: completed
   - id: validate
     content: Run the Validation checks; golden files unchanged; update MIGRATION.md and the master plan; one commit per PR
-    status: pending
+    status: completed
 isProject: false
 ---
 

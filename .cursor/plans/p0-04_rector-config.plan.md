@@ -1,16 +1,16 @@
 ---
 name: p0-rector-config
-overview: "Commit a rector.php that targets PHP 7.4, the runtime the code runs on now, and pin Rector at 2.8.4 so a dry run on the current code is empty. The dry run is run by hand as the check."
+overview: Commit a rector.php that targets PHP 7.4, the runtime the code runs on now, and pin Rector at 2.8.4 so a dry run on the current code is empty. The dry run is run by hand as the check.
 todos:
   - id: verify
     content: Verify the preconditions below; save the dry-run output to a file outside the repository
-    status: pending
+    status: completed
   - id: pr1-rector-config
     content: "PR 1: Add rector/rector 2.8.4 as dev dependency and commit rector.php targeting PHP 7.4 (Approval: new dev dependency)"
-    status: pending
+    status: completed
   - id: validate
     content: Run the Validation checks; golden files unchanged; update MIGRATION.md and the master plan; one commit per PR
-    status: pending
+    status: completed
 isProject: false
 ---
 

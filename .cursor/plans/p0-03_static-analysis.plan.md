@@ -1,16 +1,16 @@
 ---
 name: p0-static-analysis
-overview: "Add PHPStan at maximum level over the project code, with zero errors and no baseline. Vendor code is not analysed."
+overview: Add PHPStan at maximum level over the project code, with zero errors and no baseline. Vendor code is not analysed.
 todos:
   - id: verify
     content: Verify the preconditions below; save the first PHPStan run output to a file outside the repository
-    status: pending
+    status: completed
   - id: pr1-phpstan
     content: "PR 1: Add phpstan/phpstan as dev dependency and phpstan.neon at level max; fix errors without changing a golden reply (Approval: new dev dependency)"
-    status: pending
+    status: completed
   - id: validate
     content: Run the Validation checks; golden files unchanged; update MIGRATION.md and the master plan; one commit per PR
-    status: pending
+    status: completed
 isProject: false
 ---
 

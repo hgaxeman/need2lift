@@ -1,16 +1,16 @@
 ---
 name: p2-hello-symfony
-overview: "Symfony serves /api/hello with the same greeting, status and content type. Zend stops answering that path. The golden files for the greeting pass unchanged, and the trailing-slash behaviour is checked against Symfony 7.4."
+overview: Symfony serves /api/hello with the same greeting, status and content type. Zend stops answering that path. The golden files for the greeting pass unchanged, and the trailing-slash behaviour is checked against Symfony 7.4.
 todos:
   - id: verify
     content: Verify whether Symfony 7.4 redirects /api/hello/ to /api/hello; save the Symfony response for that path
-    status: pending
+    status: completed
   - id: pr1-hello
     content: "PR 1: Symfony controller for api-hello returning the greeting; /api/hello added to the bridge list (ADR-0009)"
-    status: pending
+    status: completed
   - id: validate
     content: Run the Validation checks; golden files unchanged; update MIGRATION.md and the master plan; one commit per PR
-    status: pending
+    status: completed
 isProject: false
 ---
 

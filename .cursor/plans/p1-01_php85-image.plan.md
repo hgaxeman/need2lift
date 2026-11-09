@@ -4,13 +4,13 @@ overview: "Move the runtime from PHP 7.4 to 8.5 in one step: base image php:8.5-
 todos:
   - id: verify
     content: Verify the composer:2.2 build stage runs on PHP 8.5 and that the golden suite passes against the current image; save both outputs
-    status: pending
+    status: completed
   - id: pr1-php85
     content: "PR 1: Dockerfile base php:8.5-apache, Bullseye workaround removed, Composer with --ignore-platform-req=php (Approval: runtime image change)"
-    status: pending
+    status: completed
   - id: validate
     content: Run the Validation checks; golden files unchanged; update MIGRATION.md and the master plan; one commit per PR
-    status: pending
+    status: completed
 isProject: false
 ---
 
