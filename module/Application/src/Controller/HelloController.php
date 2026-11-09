@@ -10,7 +10,10 @@ class HelloController extends AbstractActionController
     {
         $response = $this->getResponse();
         $response->getHeaders()->addHeaderLine('Content-Type', 'text/plain; charset=utf-8');
-        $response->setContent('Hello from PHP 7.4, Zend Framework 2');
+        $response->setContent(sprintf(
+            'Hello from PHP %s',
+            PHP_VERSION
+        ));
 
         return $response;
     }
