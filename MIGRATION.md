@@ -18,8 +18,8 @@ See [Contracts that must not change](#contracts-that-must-not-change).
 | Console | none | No console commands exist. |
 | Mail, templates, logging, HTTP clients, CORS, sanitising | none | None in use (inventory 2026-11-09). |
 | Tests | PHPUnit 13.4.6, black-box HTTP golden files | Upgraded in p3-03 (2026-11-09) from 9.6.38; requires PHP ≥8.4.1 and supports PHP 8.5. Runner verified on host PHP 8.5.4 against the Compose image (PHP 8.5.12); goldens unchanged. [ADR-0010](docs/adr/0010-black-box-harness.md) |
-| Static analysis | PHPStan 2.3.5, maximum level, zero errors, no baseline, run by hand (no CI) | Runs on host PHP 8.5.4 (`require.php` `^8.5`). Verified 2026-11-09 after p3-02: 0 errors. [ADR-0006](docs/adr/0006-safety-net.md) |
-| Refactoring | Rector 2.8.4, `rector.php` committed, dry run must be empty | Pinned exactly as a dev dependency. Target PHP 8.5, type coverage level 0. Verified 2026-11-09: dry run 0 files. [ADR-0006](docs/adr/0006-safety-net.md) |
+| Static analysis | PHPStan 2.3.5, maximum level, zero errors, no baseline, run by hand (no CI) | Already the newest release with PHP 8.5 support (since 2.1.32). Runs on host PHP 8.5.4 (`require.php` `^8.5`). Re-verified 2026-11-09 in p3-03: 0 errors. [ADR-0006](docs/adr/0006-safety-net.md) |
+| Refactoring | Rector 2.8.4, `rector.php` committed, dry run must be empty | Already the newest pinned release; supports upgrades through PHP 8.5. Target PHP 8.5, type coverage level 0. Re-verified 2026-11-09 in p3-03: dry run 0 files. [ADR-0006](docs/adr/0006-safety-net.md) |
 | Coding standard | none chosen | Add one only if Rector's output needs it (verify at Phase 1). |
 
 ## Current state
@@ -106,7 +106,7 @@ Every todo is one change that ends green. Plans live in `.cursor/plans/`.
 
 11. **p3-symfony-unknown-and-failures.** Symfony answers unknown requests and dispatch failures. Done 2026-11-09: default Symfony HTML 404 was `text/html` ~1.7KiB; replaced with frozen text/plain. Catch-all bridge; failure route on Symfony test overlay; goldens unchanged. Plan: `p3-01_symfony-unknown-and-failures.plan.md`.
 12. **p3-remove-zend.** Delete the module, the Zend packages and the Composer override; tighten `require.php`. Done 2026-11-09: `module/` and `config/application.config.php` gone; twelve `zendframework/*` requirements removed (25 lock removals); `require.php` `^8.5`; Dockerfile Composer has no `--ignore-platform-req=php`; `public/index.php` is Symfony-only; goldens unchanged. (Approval: PHP constraint change, dependency removal.) Plan: `p3-02_remove-zend.plan.md`.
-13. **p3-upgrade-tools.** PHPUnit, Rector and PHPStan on releases that support PHP 8.5. PHPUnit done 2026-11-09: `phpunit/phpunit` ^13.4 → 13.4.6; `tests/phpunit.xml.dist` schema 13.4 and `recordTestRunHistory="false"`; data provider moved to `#[DataProvider]` (annotations removed in PHPUnit 13); goldens unchanged. Rector/PHPStan confirmation is the second commit of this todo. (Approval: dependency change.) Plan: `p3-03_upgrade-tools.plan.md`.
+13. **p3-upgrade-tools.** Done 2026-11-09. PHPUnit ^13.4 → 13.4.6 (schema 13.4, `recordTestRunHistory="false"`, `#[DataProvider]`; goldens unchanged). Rector 2.8.4 and PHPStan 2.3.5 were already the newest PHP 8.5–capable releases; dry run empty and PHPStan 0 errors re-verified. Version list: `~/.cache/rector/reports/need2lift/p3-03-tool-versions-20261109.txt`. (Approval: dependency change.) Plan: `p3-03_upgrade-tools.plan.md`.
 
 ## Decisions
 
@@ -130,14 +130,14 @@ Every todo is one change that ends green. Plans live in `.cursor/plans/`.
 
 | What | Where | Use |
 | --- | --- | --- |
-| Rector 2.8.4 | `vendor/bin/rector` (dev dependency), `rector.php` | `TMPDIR=~/.cache/rector vendor/bin/rector process --config rector.php --dry-run --no-progress-bar`. Paths: `public`, `config`, `src` (`module/` removed in p3-02). PHP 8.5 target, type coverage level 0. Verified 2026-11-09 after p3-02: dry run clean. Global `~/.local/bin/rector` remains for the skill scripts. |
+| Rector 2.8.4 | `vendor/bin/rector` (dev dependency), `rector.php` | `TMPDIR=~/.cache/rector vendor/bin/rector process --config rector.php --dry-run --no-progress-bar`. Paths: `public`, `config`, `src` (`module/` removed in p3-02). PHP 8.5 target, type coverage level 0. Newest release as of 2026-11-09; re-verified in p3-03: dry run clean. Global `~/.local/bin/rector` remains for the skill scripts. |
 | Rector scripts | `~/.cursor/skills/legacy-lift/scripts/` | `rector-intro.sh`, `rector-php-upgrade-dry-run.sh`, `check-system.sh` |
 | Probe script | `~/.cache/rector/reports/need2lift/probe.sh` | `bash probe.sh <project> 7.4 8.2 8.4 8.5`. Serves each runtime and prints status, content type and body. Outside the repository. |
 | Host vendor | `vendor/` (gitignored) | `composer install` on the host (platform `^8.5`, no ignore) |
 | Docker | server 29.9.3, compose 5.7.0 | `docker compose build`, `docker compose up -d` |
 | Host PHP | 8.5.4 | Runs Rector and the analysis commands |
 | PHPUnit 13.4.6 | `vendor/bin/phpunit` (dev dependency), `tests/phpunit.xml.dist` | Black-box golden runner plus bridge unit tests. Suites: `golden` (`tests/Golden/`), `bridge` (`tests/Bridge/`). 15 files in `tests/golden/`. Upgraded 2026-11-09 in p3-03 (from 9.6.38); verified on host PHP 8.5.4 against Compose PHP 8.5.12. Default image: `BASE_URL=http://localhost:8080 vendor/bin/phpunit -c tests/phpunit.xml.dist`. Failure route: `docker compose -f docker-compose.yml -f docker-compose.test.yml up -d --build`, then `GOLDEN_FAILURE_ROUTE=1 BASE_URL=http://localhost:8080 vendor/bin/phpunit -c tests/phpunit.xml.dist`. Re-record only with `GOLDEN_RECORD=1` (needs approval). |
-| PHPStan 2.3.5 | `vendor/bin/phpstan` (dev dependency), `phpstan.neon` | `vendor/bin/phpstan analyse --level=max --no-progress`. Paths: `public`, `config`, `src`. 0 errors, no baseline. Verified 2026-11-09 after p3-02 on host PHP 8.5.4. |
+| PHPStan 2.3.5 | `vendor/bin/phpstan` (dev dependency), `phpstan.neon` | `vendor/bin/phpstan analyse --level=max --no-progress`. Paths: `public`, `config`, `src`. 0 errors, no baseline. Newest release as of 2026-11-09; re-verified in p3-03 on host PHP 8.5.4. |
 | Symfony 7.4.23 | `bin/console`, `src/Kernel.php`, Flex | Front controller is Symfony-only. Greeting via `api-hello`; unknowns/failures via `PlainTextExceptionListener`. Trailing-slash redirect disabled. Zend packages and `module/` removed in p3-02. |
 
 Rector from the project root: `TMPDIR=~/.cache/rector vendor/bin/rector process --config rector.php --dry-run --no-progress-bar`.

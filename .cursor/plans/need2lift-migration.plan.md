@@ -40,7 +40,7 @@ todos:
     status: completed
   - id: p3-upgrade-tools
     content: "Phase 3: Upgrade PHPUnit and Rector to versions that support PHP 8.5 (Approval: dependency change)"
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -148,7 +148,7 @@ Run from the repository root unless stated otherwise. There is no CI, so these c
 ### p3-upgrade-tools
 
 - Upgrade PHPUnit and Rector to versions that support PHP 8.5. Verify each version's PHP support before the change (verify). (Approval: dependency change.)
-- Done when the golden suite, PHPStan and the Rector dry run pass on PHP 8.5.
+- Done 2026-11-09: PHPUnit 13.4.6 (from 9.6.38); Rector 2.8.4 and PHPStan 2.3.5 already newest with PHP 8.5 support; golden suite, PHPStan (0 errors) and Rector dry run (empty) pass on host PHP 8.5.4 against Compose PHP 8.5.12.
 
 ## Prerequisites the user must provide
 
