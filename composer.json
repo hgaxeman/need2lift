@@ -1,21 +1,9 @@
 {
     "name": "need2lift/hello",
-    "description": "Minimal Zend Framework 2 hello endpoint",
+    "description": "Minimal Symfony hello endpoint",
     "type": "project",
     "require": {
-        "php": "^7.4",
-        "zendframework/zend-config": "3.3.0",
-        "zendframework/zend-eventmanager": "3.2.1",
-        "zendframework/zend-http": "2.11.2",
-        "zendframework/zend-i18n": "2.10.1",
-        "zendframework/zend-loader": "2.6.1",
-        "zendframework/zend-log": "2.12.0",
-        "zendframework/zend-modulemanager": "2.8.4",
-        "zendframework/zend-mvc": "2.7.15",
-        "zendframework/zend-serializer": "2.9.1",
-        "zendframework/zend-servicemanager": "3.4.0",
-        "zendframework/zend-stdlib": "3.2.1",
-        "zendframework/zend-view": "2.11.4",
+        "php": "^8.5",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "^7.4",
         "symfony/runtime": "^7.4",
@@ -25,7 +13,6 @@
     },
     "autoload": {
         "psr-4": {
-            "Application\\": "module/Application/src/",
             "App\\": "src/"
         }
     },

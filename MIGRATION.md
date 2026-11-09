@@ -11,14 +11,14 @@ See [Contracts that must not change](#contracts-that-must-not-change).
 | Layer | Target | Notes |
 | --- | --- | --- |
 | PHP | 8.5 | Active support until 31 Dec 2027, security until 31 Dec 2029 (php.net, measured 2026-11-09). [ADR-0004](docs/adr/0004-target-php-85.md) |
-| Framework | Symfony 7.4 LTS | Installed 2026-11-09: framework-bundle/runtime/dotenv/yaml/console 7.4.23 (Flex 2.12.0), kernel boots on PHP 8.5; Zend still serves every request. Bug fixes until Nov 2028, security until Nov 2029; requires PHP 8.2 or newer (symfony.com). [ADR-0003](docs/adr/0003-target-symfony-lts.md), [ADR-0011](docs/adr/0011-symfony-footprint.md) |
-| Bridge framework | none | Zend serves until removal; Symfony joins in the same process. [ADR-0005](docs/adr/0005-incremental-one-process.md), [ADR-0009](docs/adr/0009-bridge-routing.md) |
+| Framework | Symfony 7.4 LTS | Installed 2026-11-09: framework-bundle/runtime/dotenv/yaml/console 7.4.23 (Flex 2.12.0). Zend removed 2026-11-09 (p3-02); Symfony serves every request. Bug fixes until Nov 2028, security until Nov 2029; requires PHP 8.2 or newer (symfony.com). [ADR-0003](docs/adr/0003-target-symfony-lts.md), [ADR-0011](docs/adr/0011-symfony-footprint.md) |
+| Bridge framework | none | Path-list bridge remains as history (`['*']`); front controller boots Symfony only. [ADR-0005](docs/adr/0005-incremental-one-process.md), [ADR-0009](docs/adr/0009-bridge-routing.md) |
 | ORM | none | No database in use. [ADR-0007](docs/adr/0007-out-of-scope.md) |
 | API | none | Plain text, one greeting; no new API. [ADR-0002](docs/adr/0002-frozen-contracts.md) |
 | Console | none | No console commands exist. |
 | Mail, templates, logging, HTTP clients, CORS, sanitising | none | None in use (inventory 2026-11-09). |
 | Tests | PHPUnit 9.6, black-box HTTP golden files | Upgraded after Zend is removed. Runner verified on host PHP 8.5.4 and `php:7.4-cli` against the Compose image (now PHP 8.5). [ADR-0010](docs/adr/0010-black-box-harness.md) |
-| Static analysis | PHPStan 2.3.5, maximum level, zero errors, no baseline, run by hand (no CI) | Runs on PHP 7.4 (Composer requires `php ^7.4` or `^8.0`). Verified 2026-11-09: 0 errors. [ADR-0006](docs/adr/0006-safety-net.md) |
+| Static analysis | PHPStan 2.3.5, maximum level, zero errors, no baseline, run by hand (no CI) | Runs on host PHP 8.5.4 (`require.php` `^8.5`). Verified 2026-11-09 after p3-02: 0 errors. [ADR-0006](docs/adr/0006-safety-net.md) |
 | Refactoring | Rector 2.8.4, `rector.php` committed, dry run must be empty | Pinned exactly as a dev dependency. Target PHP 8.5, type coverage level 0. Verified 2026-11-09: dry run 0 files. [ADR-0006](docs/adr/0006-safety-net.md) |
 | Coding standard | none chosen | Add one only if Rector's output needs it (verify at Phase 1). |
 
@@ -26,27 +26,20 @@ See [Contracts that must not change](#contracts-that-must-not-change).
 
 Measured on 2026-11-09 in `/home/njegovan/PhpstormProjects/need2lift`, at commit `e21c4b7` ("hello php"), which sits on `d252383` ("init - php 7.4").
 
-- **Runtime:** `Dockerfile` line 1 `FROM composer:2.2 AS composer` (Composer 2.2.31 on PHP 8.5.12 in that image, verified 2026-11-09), line 3 `FROM php:8.5-apache`. Bullseye apt archive workaround removed. Extensions: `intl` and `zip` (`libicu-dev`, `libzip-dev`). Composer install uses `--ignore-platform-req=php` only ([ADR-0008](docs/adr/0008-single-php-raise.md)). `display_errors=Off`, `log_errors=On`. `docker-compose.yml` builds it and publishes `8080:80`. No CI configuration and no production runtime: this is a demo project, and the Compose image is the only runtime ([ADR-0013](docs/adr/0013-demo-no-production-no-ci.md)). Host PHP for analysis is 8.5.4. Golden suite verified 2026-11-09 against the 8.5 image: greeting `Hello from PHP 8.5.12`, files under `tests/golden/` unchanged.
-- **Size:** Project PHP under `public/`, `config/`, `module/`, and `src/` (`App\Kernel`, `App\Bridge\*`). 4 test classes under `tests/Golden/`, 1 under `tests/Bridge/`. 15 golden files in `tests/golden/` (13 public contract cases, 1 dispatch-failure case, 1 default-image absence guard).
-- **Framework modules loaded:** Zend `Application` remains on disk but is unused for HTTP. Symfony answers every request (`config/symfony_bridge_paths.php` is `['*']`). `App\Controller\HelloController` serves `api-hello`; `PlainTextExceptionListener` maps exceptions to frozen `Not found` / `Error` text/plain replies.
-- **Composer:** `require.php` stays `^7.4` (Symfony 7.4 resolves beside Zend with `--ignore-platform-req=php`, verified 2026-11-09; raise deferred to p3-02). `composer.lock` holds 87 packages (57 prod, 30 dev), platform `^7.4`. Direct Symfony: `framework-bundle`, `runtime`, `dotenv`, `yaml`, `console` at ^7.4, plus `symfony/flex` ^2 with `extra.symfony.require` `7.4.*`. Dev: `phpunit/phpunit` 9.6.38, `phpstan/phpstan` 2.3.5, `rector/rector` 2.8.4. 12 direct Zend packages; `zendframework/zend-mvc` 2.7.15. All Zend packages are marked abandoned in favour of `laminas/*`. No forks, no `dev-*` versions, no VCS or path repositories.
-- **Vendor:** `vendor/` was installed on the host on 2026-11-09 with `composer install --ignore-platform-reqs`. It is gitignored. The image installs its own (`Dockerfile` composer install with `--no-scripts --ignore-platform-req=php`).
+- **Runtime:** `Dockerfile` line 1 `FROM composer:2.2 AS composer` (Composer 2.2.31 on PHP 8.5.12 in that image, verified 2026-11-09), line 3 `FROM php:8.5-apache`. Extensions: `intl` and `zip` (`libicu-dev`, `libzip-dev`). Composer install has no platform override ([ADR-0008](docs/adr/0008-single-php-raise.md)); `--ignore-platform-req=php` removed in p3-02. `display_errors=Off`, `log_errors=On`. `docker-compose.yml` builds it and publishes `8080:80`. No CI configuration and no production runtime: this is a demo project, and the Compose image is the only runtime ([ADR-0013](docs/adr/0013-demo-no-production-no-ci.md)). Host PHP for analysis is 8.5.4. Golden suite verified 2026-11-09 after Zend removal: greeting `Hello from PHP 8.5.12`, files under `tests/golden/` unchanged.
+- **Size:** Project PHP under `public/`, `config/`, and `src/` (`App\Kernel`, `App\Bridge\*`, controllers, exception listeners). `module/` deleted in p3-02. 4 test classes under `tests/Golden/`, bridge tests under `tests/Bridge/`. 15 golden files in `tests/golden/` (13 public contract cases, 1 dispatch-failure case, 1 default-image absence guard).
+- **Framework:** Symfony only. `public/index.php` boots `App\Bridge\SymfonyFrontController` with no Zend fallback. `App\Controller\HelloController` serves `api-hello`; `PlainTextExceptionListener` maps exceptions to frozen `Not found` / `Error` text/plain replies. Bridge list remains `['*']` in `config/symfony_bridge_paths.php` (unused by the front controller after p3-02; kept for ADR-0009 history and unit tests).
+- **Composer:** `require.php` is `^8.5` (raised in p3-02). `composer.lock` holds 62 packages (32 prod, 30 dev), platform `^8.5`. Direct Symfony: `framework-bundle`, `runtime`, `dotenv`, `yaml`, `console` at ^7.4, plus `symfony/flex` ^2 with `extra.symfony.require` `7.4.*`. Dev: `phpunit/phpunit` 9.6.38, `phpstan/phpstan` 2.3.5, `rector/rector` 2.8.4. All `zendframework/*` packages removed (25 lock removals including transitive). No forks, no `dev-*` versions, no VCS or path repositories.
+- **Vendor:** `vendor/` installed on the host with `composer install` (no platform ignore). It is gitignored. The image installs its own (`Dockerfile` composer install with `--no-scripts`, no PHP platform override). `vendor/zendframework` is absent after a clean install.
 - **Symfony env:** `APP_SECRET` is supplied by the Compose service environment (`docker-compose.yml`), never committed. Set `APP_SECRET` in the shell when running Compose. `.env` holds non-secret defaults only (`APP_ENV`, `DEFAULT_URI`).
 
 ### Zend usage
 
-| Component | Refs | Replacement |
-| --- | --- | --- |
-| `Zend\Mvc` (`Application`, `MvcEvent`, `AbstractActionController`) | 8 | Symfony HTTP kernel and controllers |
-| `Zend\EventManager` (`EventInterface`) | 2 | Symfony event listeners for exceptions |
-| `Zend\ModuleManager` (`BootstrapListenerInterface`) | 2 | None; removed with the module |
-| Direct packages with no explicit reference: config, http, i18n, loader, log, serializer, servicemanager, stdlib, view | 0 | Removed with Zend |
+Removed in p3-02 (2026-11-09). `module/`, `config/application.config.php`, twelve direct `zendframework/*` requirements and their transitive packages are gone. `git grep -i zend` finds matches only under `docs/`, `MIGRATION.md` and `.cursor/`.
 
-Counts from the inventory of 2026-11-09 across `public/`, `config/`, `module/`.
+### Entry points
 
-### Entry points to migrate
-
-- **HTTP:** route `api-hello` at `/api/hello`, no method constraint, served by Symfony. Unknown paths and dispatch failures are handled by `App\EventListener\PlainTextExceptionListener` / `App\Http\PlainTextErrorReply` (404 → `Not found`, other ≥400 kept with body `Error`, &lt;400 forced to 500 `Error`). The test-only `/test/dispatch-failure` is mounted by `docker-compose.test.yml` as `config/routes/zz_test_routes.yaml`. The front controller always boots Symfony (`*` in the bridge list); Zend bootstrap remains in `public/index.php` until p3-02. Trailing-slash redirect disabled via `CompiledUrlMatcher` (see [ADR-0009](docs/adr/0009-bridge-routing.md)).
+- **HTTP:** route `api-hello` at `/api/hello`, no method constraint, served by Symfony. Unknown paths and dispatch failures are handled by `App\EventListener\PlainTextExceptionListener` / `App\Http\PlainTextErrorReply` (404 → `Not found`, other ≥400 kept with body `Error`, &lt;400 forced to 500 `Error`). The test-only `/test/dispatch-failure` is mounted by `docker-compose.test.yml` as `config/routes/zz_test_routes.yaml`. `public/index.php` is Symfony-only. Trailing-slash redirect disabled via `CompiledUrlMatcher` (see [ADR-0009](docs/adr/0009-bridge-routing.md)).
 - **Console:** none.
 - **Scheduled tasks:** none. No cron file, Kubernetes CronJob, CI schedule or infrastructure file.
 - **Queue consumers, RPC endpoints:** none.
@@ -71,7 +64,7 @@ Rector 2.8.4, measured 2026-11-09 at `e21c4b7`:
 - Type-coverage level 0, PHP 7.4 target (`rector-intro.sh`): 0 files would change, 0 errors.
 - PHP 7.4 upgrade set: 0 files would change, 0 errors. Composer blockers: none.
 - PHP 8.5 upgrade set: 0 files would change, 0 errors.
-- Composer blockers for PHP 8.5 (`composer why-not`, against the lock): the root `need2lift/hello` requires `php ^7.4`, and 22 locked `zendframework/*` packages require `^5.6 || ^7.0`, `^5.5 || ^7.0` (zend-mvc) or `^7.1` (zend-validator). Removal of the blockers is the Zend removal in Phase 3. Full list: `~/.cache/rector/reports/need2lift/php85-20261109-220554/composer.txt`.
+- Composer blockers for PHP 8.5 (`composer why-not`, against the lock): cleared in p3-02. Before removal: the root `need2lift/hello` required `php ^7.4`, and 22 locked `zendframework/*` packages required `^5.6 || ^7.0`, `^5.5 || ^7.0` (zend-mvc) or `^7.1` (zend-validator). Full pre-removal list: `~/.cache/rector/reports/need2lift/php85-20261109-220554/composer.txt`. After p3-02: `require.php` is `^8.5`, Zend packages are gone, and the image installs without `--ignore-platform-req=php`.
 
 ## Contracts that must not change
 
@@ -112,7 +105,7 @@ Every todo is one change that ends green. Plans live in `.cursor/plans/`.
 ### Phase 3: remove Zend
 
 11. **p3-symfony-unknown-and-failures.** Symfony answers unknown requests and dispatch failures. Done 2026-11-09: default Symfony HTML 404 was `text/html` ~1.7KiB; replaced with frozen text/plain. Catch-all bridge; failure route on Symfony test overlay; goldens unchanged. Plan: `p3-01_symfony-unknown-and-failures.plan.md`.
-12. **p3-remove-zend.** Delete the module, the Zend packages and the Composer override; tighten `require.php`. (Approval: PHP constraint change, dependency removal.) Plan: `p3-02_remove-zend.plan.md`.
+12. **p3-remove-zend.** Delete the module, the Zend packages and the Composer override; tighten `require.php`. Done 2026-11-09: `module/` and `config/application.config.php` gone; twelve `zendframework/*` requirements removed (25 lock removals); `require.php` `^8.5`; Dockerfile Composer has no `--ignore-platform-req=php`; `public/index.php` is Symfony-only; goldens unchanged. (Approval: PHP constraint change, dependency removal.) Plan: `p3-02_remove-zend.plan.md`.
 13. **p3-upgrade-tools.** PHPUnit upgraded to a version that supports PHP 8.5 (verify). (Approval: dependency change.) Plan: `p3-03_upgrade-tools.plan.md`.
 
 ## Decisions
@@ -137,15 +130,15 @@ Every todo is one change that ends green. Plans live in `.cursor/plans/`.
 
 | What | Where | Use |
 | --- | --- | --- |
-| Rector 2.8.4 | `vendor/bin/rector` (dev dependency), `rector.php` | `TMPDIR=~/.cache/rector vendor/bin/rector process --config rector.php --dry-run --no-progress-bar`. Paths: `public`, `config`, `module`, `src`. PHP 8.5 target, type coverage level 0. Verified 2026-11-09 after p2-01: dry run clean. Global `~/.local/bin/rector` remains for the skill scripts. |
+| Rector 2.8.4 | `vendor/bin/rector` (dev dependency), `rector.php` | `TMPDIR=~/.cache/rector vendor/bin/rector process --config rector.php --dry-run --no-progress-bar`. Paths: `public`, `config`, `src` (`module/` removed in p3-02). PHP 8.5 target, type coverage level 0. Verified 2026-11-09 after p3-02: dry run clean. Global `~/.local/bin/rector` remains for the skill scripts. |
 | Rector scripts | `~/.cursor/skills/legacy-lift/scripts/` | `rector-intro.sh`, `rector-php-upgrade-dry-run.sh`, `check-system.sh` |
 | Probe script | `~/.cache/rector/reports/need2lift/probe.sh` | `bash probe.sh <project> 7.4 8.2 8.4 8.5`. Serves each runtime and prints status, content type and body. Outside the repository. |
-| Host vendor | `vendor/` (gitignored) | `composer install --ignore-platform-reqs` on the host, for Rector only |
+| Host vendor | `vendor/` (gitignored) | `composer install` on the host (platform `^8.5`, no ignore) |
 | Docker | server 29.9.3, compose 5.7.0 | `docker compose build`, `docker compose up -d` |
 | Host PHP | 8.5.4 | Runs Rector and the analysis commands |
 | PHPUnit 9.6.38 | `vendor/bin/phpunit` (dev dependency) | Black-box golden runner plus bridge unit tests. Suites: `golden` (`tests/Golden/`), `bridge` (`tests/Bridge/`). 15 files in `tests/golden/`. Default image: `BASE_URL=http://localhost:8080 vendor/bin/phpunit -c tests/phpunit.xml.dist`. Failure route: `docker compose -f docker-compose.yml -f docker-compose.test.yml up -d --build`, then `GOLDEN_FAILURE_ROUTE=1 BASE_URL=http://localhost:8080 vendor/bin/phpunit -c tests/phpunit.xml.dist`. Re-record only with `GOLDEN_RECORD=1` (needs approval). |
-| PHPStan 2.3.5 | `vendor/bin/phpstan` (dev dependency), `phpstan.neon` | `vendor/bin/phpstan analyse --level=max --no-progress`. Paths: `public`, `config`, `module`, `src`. 0 errors, no baseline. Verified 2026-11-09 after p2-02 on host PHP 8.5.4. |
-| Symfony 7.4.23 | `bin/console`, `src/Kernel.php`, Flex, bridge | Bridge list is `['*']` (all HTTP). Greeting via `api-hello`; unknowns/failures via `PlainTextExceptionListener`. Trailing-slash redirect disabled. Zend code unused for HTTP until p3-02. |
+| PHPStan 2.3.5 | `vendor/bin/phpstan` (dev dependency), `phpstan.neon` | `vendor/bin/phpstan analyse --level=max --no-progress`. Paths: `public`, `config`, `src`. 0 errors, no baseline. Verified 2026-11-09 after p3-02 on host PHP 8.5.4. |
+| Symfony 7.4.23 | `bin/console`, `src/Kernel.php`, Flex | Front controller is Symfony-only. Greeting via `api-hello`; unknowns/failures via `PlainTextExceptionListener`. Trailing-slash redirect disabled. Zend packages and `module/` removed in p3-02. |
 
 Rector from the project root: `TMPDIR=~/.cache/rector vendor/bin/rector process --config rector.php --dry-run --no-progress-bar`.
 
@@ -158,9 +151,9 @@ Rector from the project root: `TMPDIR=~/.cache/rector vendor/bin/rector process 
 The repository has no contributing guide, so the approval list is the one agreed in the grilling (Q11):
 
 - Changing a frozen contract or a golden file (any todo that edits `tests/golden/`).
-- Changing the `composer.json` PHP constraint or the image's PHP version (p1-01, p2-01 if needed, p3-02).
+- Changing the `composer.json` PHP constraint or the image's PHP version (p1-01 done; p3-02 raised `require.php` to `^8.5`).
 - Adding a dependency that is not needed to reach Symfony 7.4 on PHP 8.5: PHPUnit (p0-01), PHPStan (p0-03), Rector (p0-04), PHPUnit upgrade (p3-03). Symfony packages (p2-01) are needed and still listed for approval because they add to `composer.json`.
-- Removing the `--ignore-platform-req=php` override (p3-02).
+- Removing the `--ignore-platform-req=php` override (p3-02, done).
 
 ## References
 

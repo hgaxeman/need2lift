@@ -3,5 +3,4 @@ parameters:
     paths:
         - public
         - config
-        - module
         - src

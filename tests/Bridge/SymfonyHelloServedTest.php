@@ -7,7 +7,7 @@ namespace Bridge;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Proves /api/hello is answered by Symfony (internal header), not Zend.
+ * Proves /api/hello is answered by Symfony (internal header).
  * The header is not part of any golden file.
  */
 final class SymfonyHelloServedTest extends TestCase

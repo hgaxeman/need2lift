@@ -37,7 +37,7 @@ todos:
     status: completed
   - id: p3-remove-zend
     content: "Phase 3: Delete module/ and Zend packages, remove the Composer override, tighten require.php (Approval: PHP constraint change, dependency removal)"
-    status: pending
+    status: completed
   - id: p3-upgrade-tools
     content: "Phase 3: Upgrade PHPUnit and Rector to versions that support PHP 8.5 (Approval: dependency change)"
     status: pending

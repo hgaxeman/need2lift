@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Bridge;
 
 /**
- * Exact, case-sensitive path matcher for the Zend→Symfony bridge (ADR-0009).
+ * Exact, case-sensitive path matcher for the Symfony bridge list (ADR-0009).
  * The query string is ignored; only the path is compared to the list.
  * The sentinel "*" matches every path (Symfony answers all HTTP requests).
  */

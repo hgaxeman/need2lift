@@ -23,12 +23,11 @@ COPY composer.json composer.lock symfony.lock ./
 COPY .env .env.dev ./
 COPY bin bin
 COPY config config
-COPY module module
 COPY public public
 COPY src src
 
 RUN mkdir -p var/cache var/log var/share \
-    && composer install --no-dev --no-interaction --prefer-dist --no-progress --no-scripts --ignore-platform-req=php \
+    && composer install --no-dev --no-interaction --prefer-dist --no-progress --no-scripts \
     && chown -R www-data:www-data /var/www/html
 
 EXPOSE 80

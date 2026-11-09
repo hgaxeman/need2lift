@@ -9,7 +9,6 @@ return RectorConfig::configure()
     ->withPaths([
         __DIR__ . '/public',
         __DIR__ . '/config',
-        __DIR__ . '/module',
         __DIR__ . '/src',
     ])
     ->withSkip([
