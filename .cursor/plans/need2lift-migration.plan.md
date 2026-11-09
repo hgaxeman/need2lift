@@ -22,7 +22,7 @@ todos:
     status: completed
   - id: p1-rector-85
     content: "Phase 1: Rector config pinned to PHP 8.5, dry run empty"
-    status: pending
+    status: completed
   - id: p2-symfony-install
     content: "Phase 2: Minimal Symfony 7.4 with Flex; code under App\\ in src/ (Approval: new dependencies, and composer.json PHP constraint if it must change)"
     status: pending

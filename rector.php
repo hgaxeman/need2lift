@@ -14,5 +14,5 @@ return RectorConfig::configure()
     ->withSkip([
         '*/vendor/*',
     ])
-    ->withPhpVersion(PhpVersion::PHP_74)
+    ->withPhpVersion(PhpVersion::PHP_85)
     ->withTypeCoverageLevel(0);

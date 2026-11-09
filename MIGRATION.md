@@ -19,7 +19,7 @@ See [Contracts that must not change](#contracts-that-must-not-change).
 | Mail, templates, logging, HTTP clients, CORS, sanitising | none | None in use (inventory 2026-11-09). |
 | Tests | PHPUnit 9.6, black-box HTTP golden files | Upgraded after Zend is removed. Runner verified on host PHP 8.5.4 and `php:7.4-cli` against the Compose image (now PHP 8.5). [ADR-0010](docs/adr/0010-black-box-harness.md) |
 | Static analysis | PHPStan 2.3.5, maximum level, zero errors, no baseline, run by hand (no CI) | Runs on PHP 7.4 (Composer requires `php ^7.4` or `^8.0`). Verified 2026-11-09: 0 errors. [ADR-0006](docs/adr/0006-safety-net.md) |
-| Refactoring | Rector 2.8.4, `rector.php` committed, dry run must be empty | Pinned exactly as a dev dependency. Target PHP 7.4, type coverage level 0. Verified 2026-11-09: dry run 0 files. [ADR-0006](docs/adr/0006-safety-net.md) |
+| Refactoring | Rector 2.8.4, `rector.php` committed, dry run must be empty | Pinned exactly as a dev dependency. Target PHP 8.5, type coverage level 0. Verified 2026-11-09: dry run 0 files. [ADR-0006](docs/adr/0006-safety-net.md) |
 | Coding standard | none chosen | Add one only if Rector's output needs it (verify at Phase 1). |
 
 ## Current state
@@ -137,7 +137,7 @@ Every todo is one change that ends green. Plans live in `.cursor/plans/`.
 
 | What | Where | Use |
 | --- | --- | --- |
-| Rector 2.8.4 | `vendor/bin/rector` (dev dependency), `rector.php` | `TMPDIR=~/.cache/rector vendor/bin/rector process --config rector.php --dry-run --no-progress-bar`. Paths: `public`, `config`, `module`. PHP 7.4 target, type coverage level 0. Verified 2026-11-09: 0 files would change. Global `~/.local/bin/rector` remains for the skill scripts. |
+| Rector 2.8.4 | `vendor/bin/rector` (dev dependency), `rector.php` | `TMPDIR=~/.cache/rector vendor/bin/rector process --config rector.php --dry-run --no-progress-bar`. Paths: `public`, `config`, `module`. PHP 8.5 target, type coverage level 0. Verified 2026-11-09 after p1-02: 0 files would change. Global `~/.local/bin/rector` remains for the skill scripts. |
 | Rector scripts | `~/.cursor/skills/legacy-lift/scripts/` | `rector-intro.sh`, `rector-php-upgrade-dry-run.sh`, `check-system.sh` |
 | Probe script | `~/.cache/rector/reports/need2lift/probe.sh` | `bash probe.sh <project> 7.4 8.2 8.4 8.5`. Serves each runtime and prints status, content type and body. Outside the repository. |
 | Host vendor | `vendor/` (gitignored) | `composer install --ignore-platform-reqs` on the host, for Rector only |
