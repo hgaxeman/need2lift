@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p0-golden-record
     content: "Phase 0: Golden files for every contract case plus a test-only route that fails dispatch; guard that the default image does not expose that route"
-    status: pending
+    status: completed
   - id: p0-static-analysis
     content: "Phase 0: PHPStan at maximum, zero errors, no baseline (Approval: new dev dependency)"
     status: pending

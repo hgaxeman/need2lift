@@ -1,0 +1,4 @@
+services:
+  app:
+    volumes:
+      - ./tests/fixtures/zz-test-routes.local.php:/var/www/html/config/autoload/zz-test-routes.local.php:ro
