@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Golden;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class ContractGoldenTest extends TestCase
 {
     /**
-     * @dataProvider publicContractCases
-     *
      * @param array<string, string> $headers
      */
+    #[DataProvider('publicContractCases')]
     public function testPublicContractMatchesGolden(
         string $goldenName,
         string $method,
@@ -31,7 +31,7 @@ final class ContractGoldenTest extends TestCase
     }
 
     /** @return iterable<string, array{0:string,1:string,2:string,3:array<string,string>}> */
-    public function publicContractCases(): iterable
+    public static function publicContractCases(): iterable
     {
         yield 'GET /api/hello' => ['GET.api-hello', 'GET', '/api/hello', []];
         yield 'POST /api/hello' => ['POST.api-hello', 'POST', '/api/hello', []];
