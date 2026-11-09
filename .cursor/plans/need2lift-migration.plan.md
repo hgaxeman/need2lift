@@ -25,7 +25,7 @@ todos:
     status: completed
   - id: p2-symfony-install
     content: "Phase 2: Minimal Symfony 7.4 with Flex; code under App\\ in src/ (Approval: new dependencies, and composer.json PHP constraint if it must change)"
-    status: pending
+    status: completed
   - id: p2-bridge-router
     content: "Phase 2: public/index.php sends only the exact path /api/hello to Symfony; everything else stays with Zend"
     status: pending

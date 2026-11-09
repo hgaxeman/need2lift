@@ -19,12 +19,16 @@ COPY docker/vhost.conf /etc/apache2/sites-available/000-default.conf
 
 WORKDIR /var/www/html
 
-COPY composer.json composer.lock ./
+COPY composer.json composer.lock symfony.lock ./
+COPY .env .env.dev ./
+COPY bin bin
 COPY config config
 COPY module module
 COPY public public
+COPY src src
 
-RUN composer install --no-dev --no-interaction --prefer-dist --no-progress --ignore-platform-req=php \
+RUN mkdir -p var/cache var/log var/share \
+    && composer install --no-dev --no-interaction --prefer-dist --no-progress --no-scripts --ignore-platform-req=php \
     && chown -R www-data:www-data /var/www/html
 
 EXPOSE 80

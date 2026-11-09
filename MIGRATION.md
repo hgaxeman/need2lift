@@ -11,7 +11,7 @@ See [Contracts that must not change](#contracts-that-must-not-change).
 | Layer | Target | Notes |
 | --- | --- | --- |
 | PHP | 8.5 | Active support until 31 Dec 2027, security until 31 Dec 2029 (php.net, measured 2026-11-09). [ADR-0004](docs/adr/0004-target-php-85.md) |
-| Framework | Symfony 7.4 LTS | Bug fixes until Nov 2028, security until Nov 2029; requires PHP 8.2 or newer (symfony.com, measured 2026-11-09). [ADR-0003](docs/adr/0003-target-symfony-lts.md), [ADR-0011](docs/adr/0011-symfony-footprint.md) |
+| Framework | Symfony 7.4 LTS | Installed 2026-11-09: framework-bundle/runtime/dotenv/yaml/console 7.4.23 (Flex 2.12.0), kernel boots on PHP 8.5; Zend still serves every request. Bug fixes until Nov 2028, security until Nov 2029; requires PHP 8.2 or newer (symfony.com). [ADR-0003](docs/adr/0003-target-symfony-lts.md), [ADR-0011](docs/adr/0011-symfony-footprint.md) |
 | Bridge framework | none | Zend serves until removal; Symfony joins in the same process. [ADR-0005](docs/adr/0005-incremental-one-process.md), [ADR-0009](docs/adr/0009-bridge-routing.md) |
 | ORM | none | No database in use. [ADR-0007](docs/adr/0007-out-of-scope.md) |
 | API | none | Plain text, one greeting; no new API. [ADR-0002](docs/adr/0002-frozen-contracts.md) |
@@ -27,11 +27,11 @@ See [Contracts that must not change](#contracts-that-must-not-change).
 Measured on 2026-11-09 in `/home/njegovan/PhpstormProjects/need2lift`, at commit `e21c4b7` ("hello php"), which sits on `d252383` ("init - php 7.4").
 
 - **Runtime:** `Dockerfile` line 1 `FROM composer:2.2 AS composer` (Composer 2.2.31 on PHP 8.5.12 in that image, verified 2026-11-09), line 3 `FROM php:8.5-apache`. Bullseye apt archive workaround removed. Extensions: `intl` and `zip` (`libicu-dev`, `libzip-dev`). Composer install uses `--ignore-platform-req=php` only ([ADR-0008](docs/adr/0008-single-php-raise.md)). `display_errors=Off`, `log_errors=On`. `docker-compose.yml` builds it and publishes `8080:80`. No CI configuration and no production runtime: this is a demo project, and the Compose image is the only runtime ([ADR-0013](docs/adr/0013-demo-no-production-no-ci.md)). Host PHP for analysis is 8.5.4. Golden suite verified 2026-11-09 against the 8.5 image: greeting `Hello from PHP 8.5.12`, files under `tests/golden/` unchanged.
-- **Size:** 5 PHP files outside `vendor/`. 4 test classes under `tests/Golden/`. 15 golden files in `tests/golden/` (13 public contract cases, 1 dispatch-failure case, 1 default-image absence guard).
-- **Framework modules loaded:** `Application` only (`config/application.config.php` lines 4-6).
-- **Composer:** `require.php` is `^7.4`. `composer.lock` holds 57 packages (27 prod, 30 dev), platform `^7.4`. Dev: `phpunit/phpunit` 9.6.38, `phpstan/phpstan` 2.3.5, `rector/rector` 2.8.4. 12 direct Zend packages; `zendframework/zend-mvc` 2.7.15. All Zend packages are marked abandoned in favour of `laminas/*`. No forks, no `dev-*` versions, no VCS or path repositories.
-- **Vendor:** `vendor/` was installed on the host on 2026-11-09 with `composer install --ignore-platform-reqs`. It is gitignored. The image installs its own (`Dockerfile` lines 27-28).
-- **Working tree:** `git status` shows only the new `GLOSSARY.md` and `docs/`, and `MIGRATION.md` once written.
+- **Size:** Project PHP under `public/`, `config/`, `module/`, and `src/` (`App\Kernel`). 4 test classes under `tests/Golden/`. 15 golden files in `tests/golden/` (13 public contract cases, 1 dispatch-failure case, 1 default-image absence guard).
+- **Framework modules loaded:** `Application` only (`config/application.config.php` lines 4-6). Symfony `FrameworkBundle` is registered in `config/bundles.php` but not reached by HTTP yet (`public/index.php` is still Zend-only).
+- **Composer:** `require.php` stays `^7.4` (Symfony 7.4 resolves beside Zend with `--ignore-platform-req=php`, verified 2026-11-09; raise deferred to p3-02). `composer.lock` holds 87 packages (57 prod, 30 dev), platform `^7.4`. Direct Symfony: `framework-bundle`, `runtime`, `dotenv`, `yaml`, `console` at ^7.4, plus `symfony/flex` ^2 with `extra.symfony.require` `7.4.*`. Dev: `phpunit/phpunit` 9.6.38, `phpstan/phpstan` 2.3.5, `rector/rector` 2.8.4. 12 direct Zend packages; `zendframework/zend-mvc` 2.7.15. All Zend packages are marked abandoned in favour of `laminas/*`. No forks, no `dev-*` versions, no VCS or path repositories.
+- **Vendor:** `vendor/` was installed on the host on 2026-11-09 with `composer install --ignore-platform-reqs`. It is gitignored. The image installs its own (`Dockerfile` composer install with `--no-scripts --ignore-platform-req=php`).
+- **Symfony env:** `APP_SECRET` is supplied by the Compose service environment (`docker-compose.yml`), never committed. Set `APP_SECRET` in the shell when running Compose. `.env` holds non-secret defaults only (`APP_ENV`, `DEFAULT_URI`).
 
 ### Zend usage
 
@@ -105,7 +105,7 @@ Every todo is one change that ends green. Plans live in `.cursor/plans/`.
 
 ### Phase 2: Symfony side by side
 
-8. **p2-symfony-install.** Minimal Symfony 7.4 with Flex. (Approval: new dependencies; conditional on the `composer.json` PHP constraint.) Plan: `p2-01_symfony-install.plan.md`.
+8. **p2-symfony-install.** Minimal Symfony 7.4 with Flex. Done 2026-11-09: kernel boots (`bin/console about` → 7.4.23 on PHP 8.5.12); `require.php` left at `^7.4`; goldens unchanged. (Approval: new dependencies; PHP constraint not raised.) Plan: `p2-01_symfony-install.plan.md`.
 9. **p2-bridge-router.** `public/index.php` sends only `/api/hello` to Symfony. Plan: `p2-02_bridge-router.plan.md`.
 10. **p2-hello-symfony.** Symfony serves the greeting and matches the golden files unchanged. Plan: `p2-03_hello-symfony.plan.md`.
 
@@ -137,14 +137,15 @@ Every todo is one change that ends green. Plans live in `.cursor/plans/`.
 
 | What | Where | Use |
 | --- | --- | --- |
-| Rector 2.8.4 | `vendor/bin/rector` (dev dependency), `rector.php` | `TMPDIR=~/.cache/rector vendor/bin/rector process --config rector.php --dry-run --no-progress-bar`. Paths: `public`, `config`, `module`. PHP 8.5 target, type coverage level 0. Verified 2026-11-09 after p1-02: 0 files would change. Global `~/.local/bin/rector` remains for the skill scripts. |
+| Rector 2.8.4 | `vendor/bin/rector` (dev dependency), `rector.php` | `TMPDIR=~/.cache/rector vendor/bin/rector process --config rector.php --dry-run --no-progress-bar`. Paths: `public`, `config`, `module`, `src`. PHP 8.5 target, type coverage level 0. Verified 2026-11-09 after p2-01: dry run clean. Global `~/.local/bin/rector` remains for the skill scripts. |
 | Rector scripts | `~/.cursor/skills/legacy-lift/scripts/` | `rector-intro.sh`, `rector-php-upgrade-dry-run.sh`, `check-system.sh` |
 | Probe script | `~/.cache/rector/reports/need2lift/probe.sh` | `bash probe.sh <project> 7.4 8.2 8.4 8.5`. Serves each runtime and prints status, content type and body. Outside the repository. |
 | Host vendor | `vendor/` (gitignored) | `composer install --ignore-platform-reqs` on the host, for Rector only |
 | Docker | server 29.9.3, compose 5.7.0 | `docker compose build`, `docker compose up -d` |
 | Host PHP | 8.5.4 | Runs Rector and the analysis commands |
 | PHPUnit 9.6.38 | `vendor/bin/phpunit` (dev dependency) | Black-box golden runner. Verified 2026-11-09 on host PHP 8.5.4 and in `php:7.4-cli` with `--network host` (`host.docker.internal` does not resolve on this Linux host). 15 files in `tests/golden/`. Default image: `BASE_URL=http://localhost:8080 vendor/bin/phpunit -c tests/phpunit.xml.dist`. Failure route: `docker compose -f docker-compose.yml -f docker-compose.test.yml up -d --build`, then `GOLDEN_FAILURE_ROUTE=1 BASE_URL=http://localhost:8080 vendor/bin/phpunit -c tests/phpunit.xml.dist`. Re-record only with `GOLDEN_RECORD=1` (needs approval). |
-| PHPStan 2.3.5 | `vendor/bin/phpstan` (dev dependency), `phpstan.neon` | `vendor/bin/phpstan analyse --level=max --no-progress`. Paths: `public`, `config`, `module`. 0 errors, no baseline. Verified on host PHP 8.5.4 and `php:7.4-cli`. |
+| PHPStan 2.3.5 | `vendor/bin/phpstan` (dev dependency), `phpstan.neon` | `vendor/bin/phpstan analyse --level=max --no-progress`. Paths: `public`, `config`, `module`, `src`. 0 errors, no baseline. Verified 2026-11-09 after p2-01 on host PHP 8.5.4. |
+| Symfony 7.4.23 | `bin/console`, `src/Kernel.php`, Flex | `APP_SECRET=… docker compose exec app php bin/console about`. Reports Symfony 7.4.23; kernel boots on the Compose PHP 8.5 image. HTTP still Zend-only until p2-02. |
 
 Rector from the project root: `TMPDIR=~/.cache/rector vendor/bin/rector process --config rector.php --dry-run --no-progress-bar`.
 

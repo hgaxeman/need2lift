@@ -4,3 +4,4 @@ parameters:
         - public
         - config
         - module
+        - src

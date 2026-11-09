@@ -10,6 +10,7 @@ return RectorConfig::configure()
         __DIR__ . '/public',
         __DIR__ . '/config',
         __DIR__ . '/module',
+        __DIR__ . '/src',
     ])
     ->withSkip([
         '*/vendor/*',

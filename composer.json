@@ -15,16 +15,40 @@
         "zendframework/zend-serializer": "2.9.1",
         "zendframework/zend-servicemanager": "3.4.0",
         "zendframework/zend-stdlib": "3.2.1",
-        "zendframework/zend-view": "2.11.4"
+        "zendframework/zend-view": "2.11.4",
+        "symfony/flex": "^2",
+        "symfony/framework-bundle": "^7.4",
+        "symfony/runtime": "^7.4",
+        "symfony/dotenv": "^7.4",
+        "symfony/yaml": "^7.4",
+        "symfony/console": "^7.4"
     },
     "autoload": {
         "psr-4": {
-            "Application\\": "module/Application/src/"
+            "Application\\": "module/Application/src/",
+            "App\\": "src/"
         }
     },
     "require-dev": {
         "phpunit/phpunit": "^9.6",
         "phpstan/phpstan": "^2.3",
         "rector/rector": "2.8.4"
+    },
+    "config": {
+        "allow-plugins": {
+            "symfony/flex": true,
+            "symfony/runtime": true
+        }
+    },
+    "extra": {
+        "symfony": {
+            "require": "7.4.*"
+        }
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
+        }
     }
 }
