@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: p0-rector-config
     content: "Phase 0: Committed rector.php targeting PHP 7.4, Rector pinned at 2.8.4 with an empty dry run (Approval: new dev dependency)"
-    status: pending
+    status: completed
   - id: p0-ci
     content: "Phase 0: CANCELLED. No CI: this is a demo project with no production runtime (ADR-0013)"
     status: cancelled
