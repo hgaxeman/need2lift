@@ -13,4 +13,4 @@ During the bridge, `public/index.php` sends a request to Symfony only when its e
 ## Consequences
 
 - The list matches the path exactly and case-sensitively. `/api/hello/` and `/API/HELLO` are not on it, so they stay unknown requests (404 `Not found`, [ADR-0002](0002-frozen-contracts.md)).
-- Whether Symfony's router answers `/api/hello/` with a redirect to `/api/hello` is not verified against 7.4. If it does, that redirect must be switched off before Symfony answers unknown requests. The trailing-slash golden file decides (verify when Symfony is installed).
+- Measured on Symfony 7.4.23 (2026-11-09): the default `RedirectableCompiledUrlMatcher` answers `GET /api/hello/` with a 301 redirect to `/api/hello` when only route `/api/hello` exists. That redirect is disabled by using `CompiledUrlMatcher` instead (`App\DependencyInjection\DisableTrailingSlashRedirectPass`). With redirects off, Symfony returns 404 for `/api/hello/`. During Phase 2 the bridge list still keeps `/api/hello/` on Zend, so the golden 404 `Not found` is unchanged either way.

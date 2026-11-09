@@ -9,11 +9,11 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * ADR-0009: exact, case-sensitive path match; query string stripped before compare.
- * The production list is empty until p2-03; this fixture uses /api/hello as that entry.
  */
 final class SymfonyPathListTest extends TestCase
 {
-    private SymfonyPathList $list;
+    /** @var SymfonyPathList */
+    private $list;
 
     protected function setUp(): void
     {
@@ -41,14 +41,16 @@ final class SymfonyPathListTest extends TestCase
         self::assertTrue($this->list->matches('/api/hello?x=1'));
     }
 
-    public function testEmptyProductionListMatchesNothing(): void
+    public function testProductionListContainsApiHelloOnly(): void
     {
         $paths = require dirname(__DIR__, 2) . '/config/symfony_bridge_paths.php';
-        self::assertSame([], $paths);
+        self::assertSame(['/api/hello'], $paths);
 
-        $empty = new SymfonyPathList($paths);
-        self::assertFalse($empty->matches('/api/hello'));
-        self::assertFalse($empty->matches('/api/hello?x=1'));
-        self::assertFalse($empty->matches('/nope'));
+        $production = new SymfonyPathList($paths);
+        self::assertTrue($production->matches('/api/hello'));
+        self::assertTrue($production->matches('/api/hello?x=1'));
+        self::assertFalse($production->matches('/api/hello/'));
+        self::assertFalse($production->matches('/API/HELLO'));
+        self::assertFalse($production->matches('/nope'));
     }
 }

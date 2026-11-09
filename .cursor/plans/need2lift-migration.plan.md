@@ -31,7 +31,7 @@ todos:
     status: completed
   - id: p2-hello-symfony
     content: "Phase 2: Symfony serves the greeting; golden files pass unchanged; trailing-slash behaviour verified"
-    status: pending
+    status: completed
   - id: p3-symfony-unknown-and-failures
     content: "Phase 3: Symfony answers unknown requests and dispatch failures with the frozen replies"
     status: pending
