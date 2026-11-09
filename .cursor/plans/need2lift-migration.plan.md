@@ -34,7 +34,7 @@ todos:
     status: completed
   - id: p3-symfony-unknown-and-failures
     content: "Phase 3: Symfony answers unknown requests and dispatch failures with the frozen replies"
-    status: pending
+    status: completed
   - id: p3-remove-zend
     content: "Phase 3: Delete module/ and Zend packages, remove the Composer override, tighten require.php (Approval: PHP constraint change, dependency removal)"
     status: pending

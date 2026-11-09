@@ -1,0 +1,5 @@
+# Test-only overlay. Mounted into config/routes/ by docker-compose.test.yml.
+# Absent from the default image, so /test/dispatch-failure does not exist there.
+test-dispatch-failure:
+    path: /test/dispatch-failure
+    controller: App\Controller\TestDispatchFailureController::fail
