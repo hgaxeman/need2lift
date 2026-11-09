@@ -41,16 +41,16 @@ final class SymfonyPathListTest extends TestCase
         self::assertTrue($this->list->matches('/api/hello?x=1'));
     }
 
-    public function testProductionListContainsApiHelloOnly(): void
+    public function testProductionListIsCatchAll(): void
     {
         $paths = require dirname(__DIR__, 2) . '/config/symfony_bridge_paths.php';
-        self::assertSame(['/api/hello'], $paths);
+        self::assertSame([SymfonyPathList::CATCH_ALL], $paths);
 
         $production = new SymfonyPathList($paths);
         self::assertTrue($production->matches('/api/hello'));
         self::assertTrue($production->matches('/api/hello?x=1'));
-        self::assertFalse($production->matches('/api/hello/'));
-        self::assertFalse($production->matches('/API/HELLO'));
-        self::assertFalse($production->matches('/nope'));
+        self::assertTrue($production->matches('/api/hello/'));
+        self::assertTrue($production->matches('/API/HELLO'));
+        self::assertTrue($production->matches('/nope'));
     }
 }
