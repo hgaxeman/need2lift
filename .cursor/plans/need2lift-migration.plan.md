@@ -28,7 +28,7 @@ todos:
     status: completed
   - id: p2-bridge-router
     content: "Phase 2: public/index.php sends only the exact path /api/hello to Symfony; everything else stays with Zend"
-    status: pending
+    status: completed
   - id: p2-hello-symfony
     content: "Phase 2: Symfony serves the greeting; golden files pass unchanged; trailing-slash behaviour verified"
     status: pending

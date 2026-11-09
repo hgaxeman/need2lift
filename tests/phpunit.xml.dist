@@ -8,5 +8,8 @@
         <testsuite name="golden">
             <directory>Golden</directory>
         </testsuite>
+        <testsuite name="bridge">
+            <directory>Bridge</directory>
+        </testsuite>
     </testsuites>
 </phpunit>
