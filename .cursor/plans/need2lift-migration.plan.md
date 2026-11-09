@@ -4,7 +4,7 @@ overview: "Move the one-endpoint Zend Framework 2 application to Symfony 7.4 LTS
 todos:
   - id: p0-golden-harness
     content: "Phase 0: Black-box PHPUnit 9.6 runner against BASE_URL (Approval: new dev dependency)"
-    status: pending
+    status: completed
   - id: p0-golden-record
     content: "Phase 0: Golden files for every contract case plus a test-only route that fails dispatch; guard that the default image does not expose that route"
     status: pending

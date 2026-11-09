@@ -27,9 +27,9 @@ See [Contracts that must not change](#contracts-that-must-not-change).
 Measured on 2026-11-09 in `/home/njegovan/PhpstormProjects/need2lift`, at commit `e21c4b7` ("hello php"), which sits on `d252383` ("init - php 7.4").
 
 - **Runtime:** `Dockerfile` line 1 `FROM composer:2.2 AS composer`, line 3 `FROM php:7.4-apache`. `docker-compose.yml` builds it and publishes `8080:80`. No CI configuration and no production runtime: this is a demo project, and the Compose image is the only runtime ([ADR-0013](docs/adr/0013-demo-no-production-no-ci.md)). Host PHP for analysis is 8.5.4.
-- **Size:** 5 PHP files outside `vendor/`. 0 test classes.
+- **Size:** 5 PHP files outside `vendor/`. 1 test class (`tests/Golden/HelloSmokeTest.php`).
 - **Framework modules loaded:** `Application` only (`config/application.config.php` lines 4-6).
-- **Composer:** `require.php` is `^7.4`. `composer.lock` holds 27 packages, 0 dev, platform `^7.4`. 12 direct Zend packages; `zendframework/zend-mvc` 2.7.15. All Zend packages are marked abandoned in favour of `laminas/*`. No forks, no `dev-*` versions, no VCS or path repositories.
+- **Composer:** `require.php` is `^7.4`. `composer.lock` holds 55 packages (27 prod, 28 dev), platform `^7.4`. Dev: `phpunit/phpunit` 9.6.38. 12 direct Zend packages; `zendframework/zend-mvc` 2.7.15. All Zend packages are marked abandoned in favour of `laminas/*`. No forks, no `dev-*` versions, no VCS or path repositories.
 - **Vendor:** `vendor/` was installed on the host on 2026-11-09 with `composer install --ignore-platform-reqs`. It is gitignored. The image installs its own (`Dockerfile` lines 33-34).
 - **Working tree:** `git status` shows only the new `GLOSSARY.md` and `docs/`, and `MIGRATION.md` once written.
 
@@ -143,6 +143,7 @@ Every todo is one change that ends green. Plans live in `.cursor/plans/`.
 | Host vendor | `vendor/` (gitignored) | `composer install --ignore-platform-reqs` on the host, for Rector only |
 | Docker | server 29.9.3, compose 5.7.0 | `docker compose build`, `docker compose up -d` |
 | Host PHP | 8.5.4 | Runs Rector and the analysis commands |
+| PHPUnit 9.6.38 | `vendor/bin/phpunit` (dev dependency) | Black-box golden runner. Verified 2026-11-09 on host PHP 8.5.4 and in `php:7.4-cli` against Compose `http://localhost:8080`. Command: `BASE_URL=http://localhost:8080 vendor/bin/phpunit -c tests/phpunit.xml.dist` |
 
 Rector from the project root, with the committed config once p0-04 lands: `TMPDIR=~/.cache/rector rector process --config rector.php --dry-run`.
 
